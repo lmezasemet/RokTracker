@@ -623,3 +623,4 @@ scans_seed/
 deps/tessdata
 deps/*.whl
 /DKP_scan
+/Analyse_kd_stats
