@@ -182,6 +182,11 @@ class KingdomScanner:
                     or self.scan_options["Rss Gathered"]
                     or self.scan_options["Helps"]
                 )
+            case 4:
+                return (
+                    self.scan_options["Kingdom_number"]
+                )        
+        
             case _:
                 return False
 
@@ -294,7 +299,7 @@ class KingdomScanner:
             self.adb_client.secure_adb_screencap().save(self.img_path / "gov_info.png")
             image = load_cv2_img(self.img_path / "gov_info.png", cv2.IMREAD_UNCHANGED)
 
-            # 1st image data (ID, Power, Killpoints, Alliance)
+            # 1st image data (ID, Power, Killpoints, Alliance, Kingdom number)
             with PyTessBaseAPI(
                 path=str(self.tesseract_path), psm=PSM.SINGLE_WORD, oem=OEM.LSTM_ONLY
             ) as api:
@@ -332,7 +337,18 @@ class KingdomScanner:
                     im_alliance_bw = preprocessImage(im_alliance_tag, 3, 50, 12, True)
 
                     governor_data.alliance = ocr_text(api, im_alliance_bw)
+                
+                if self.scan_options["Kingdom_number"]:
+                    im_gov_kingdom_number = cropToRegion(image, rok_ui.ocr_regions["Kingdom_number"])
+                    im_gov_kingdom_numbergray = cv2.cvtColor(im_gov_kingdom_number, cv2.COLOR_BGR2GRAY)
+                    im_gov_kingdom_number_gray = cv2.bitwise_not(im_gov_kingdom_numbergray)
+                    (thresh, im_gov_kingdom_number_bw) = cv2.threshold(
+                        im_gov_kingdom_number_gray, 120, 255, cv2.THRESH_BINARY
+                    )
 
+                    governor_data.kingdom_number = ocr_number(api, im_gov_kingdom_number_bw)
+                    
+                    
         if self.is_page_needed(2):
             # kills tier
             self.adb_client.secure_adb_tap(rok_ui.tap_positions["open_kills"])
@@ -441,6 +457,7 @@ class KingdomScanner:
                     governor_data.helps = preprocess_and_ocr_number(
                         api, image3, rok_ui.ocr_regions["alliance_helps"], True
                     )
+            
 
         # Just to check the progress, printing in cmd the result for each governor
         governor_data.flag_unknown()

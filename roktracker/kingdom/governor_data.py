@@ -26,7 +26,8 @@ class GovernorData:
     rss_assistance: str = "Skipped"
     rss_gathered: str = "Skipped"
     helps: str = "Skipped"
-
+    kingdom_number: str = "Skipped"
+    
     def t45_kills(self) -> str:
         if self.t4_kills != "Skipped" and self.t5_kills != "Skipped":
             return str(to_int_check(self.t4_kills) + to_int_check(self.t5_kills))
@@ -101,6 +102,9 @@ class GovernorData:
 
         if self.helps == "":
             self.helps = "Unknown"
+            
+        if self.kingdom_number == "":
+            self.kingdom_number = "Unknown"
 
     @staticmethod
     def intify_value(value: str) -> int:
@@ -112,6 +116,18 @@ class GovernorData:
             return -3
         else:
             return int(value)
+    
+    @staticmethod
+    def identify_kingdom_number(value: str, my_kingdom: int) -> int:
+        if value == "Unknown":
+            return my_kingdom
+        elif value == "Skipped":
+            return -2
+        elif not is_string_int(value):
+            return -3
+        else:
+            return int(value)
+        
 
     def validate_kills(self) -> bool:
         expectedKp = (

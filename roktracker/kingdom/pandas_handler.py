@@ -27,6 +27,7 @@ class PandasHandler:
             {
                 "ID": GovernorData.intify_value(gov_data.id),
                 "Name": gov_data.name,
+                "Kingdom_number": GovernorData.identify_kingdom_number(gov_data.kingdom_number, 3165),
                 "Power": GovernorData.intify_value(gov_data.power),
                 "Killpoints": GovernorData.intify_value(gov_data.killpoints),
                 "Deads": GovernorData.intify_value(gov_data.dead),

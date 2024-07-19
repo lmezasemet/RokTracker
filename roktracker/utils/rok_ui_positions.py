@@ -2,7 +2,8 @@
 ocr_regions = {
     # first screen
     "more_info": (285, 786, 137, 29),
-    "gov_id": (732, 191, 260, 38),
+    "gov_id": (732, 191, 120, 38),
+    "Kingdom_number": (850, 191, 60, 38),
     "power": (885, 326, 196, 38),
     "killpoints": (1135, 326, 216, 38),
     "alliance_name": (602, 326, 279, 38),
