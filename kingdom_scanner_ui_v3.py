@@ -662,6 +662,7 @@ class App(customtkinter.CTk):
                 {"name": "Rss Assistance", "default": True, "group": "Third Screen"},
                 {"name": "Rss Gathered", "default": True, "group": "Third Screen"},
                 {"name": "Helps", "default": True, "group": "Third Screen"},
+                {"name": "top", "default": True, "group": "Fourth Screen"},
                 {"name": "Kingdom_number", "default": False, "group": "Fourth Screen"},
             ],
         )
@@ -693,6 +694,7 @@ class App(customtkinter.CTk):
                 {"name": "Helps", "col": 0},
                 {"name": "Alliance", "col": 0},
                 {"name": "Kingdom_number", "col": 0},
+                {"name": "top", "col": 0},
             ],
         )
 
@@ -717,6 +719,7 @@ class App(customtkinter.CTk):
                 "Helps": 90000,
                 "Alliance": "Biggest Alliance ever!",
                 "Kingdom_number": "#3165",
+                "top": 0,
             }
         )
 
@@ -837,6 +840,7 @@ class App(customtkinter.CTk):
                 "Helps": to_int_or(gov_data.helps, "Unknown"),
                 "Alliance": gov_data.alliance,
                 "Kingdom_number": gov_data.kingdom_number,
+                "top": extra_data.current_governor,
                 "govs": f"{extra_data.current_governor} of {extra_data.target_governor}",
                 "skipped": skipped_text,
                 "time": extra_data.current_time,

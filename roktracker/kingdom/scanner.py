@@ -184,7 +184,8 @@ class KingdomScanner:
                 )
             case 4:
                 return (
-                    self.scan_options["Kingdom_number"]
+                    self.scan_options["top"]
+                    or self.scan_options["Kingdom_number"]
                 )        
         
             case _:
@@ -623,7 +624,7 @@ class KingdomScanner:
                     self.save_failed("power", gov_data)
 
             # Write results in excel file
-            data_handler.write_governor(gov_data)
+            data_handler.write_governor(gov_data, i+1)
             data_handler.save()
 
             additional_info = AdditionalData(

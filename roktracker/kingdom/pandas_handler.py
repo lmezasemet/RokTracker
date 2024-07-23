@@ -22,7 +22,7 @@ class PandasHandler:
         self.formats = formats
         self.data_list = []
 
-    def write_governor(self, gov_data: GovernorData) -> None:
+    def write_governor(self, gov_data: GovernorData, top_rank: int) -> None:
         self.data_list.append(
             {
                 "ID": GovernorData.intify_value(gov_data.id),
@@ -43,6 +43,8 @@ class PandasHandler:
                 "Rss Assistance": GovernorData.intify_value(gov_data.rss_assistance),
                 "Helps": GovernorData.intify_value(gov_data.helps),
                 "Alliance": gov_data.alliance.rstrip(),
+                "date" : pd.to_datetime("today").date(),
+                "top": top_rank,
             }
         )
 
