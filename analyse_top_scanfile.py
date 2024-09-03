@@ -20,6 +20,7 @@ def analyse_top_scanfile(file, top):
     total_t5_kills = sum(file_info["T5 Kills"])
     sum_total_kills = sum(file_info["Total Kills"])
     total_ressources_gathered = sum(file_info["Rss Gathered"])
+    date = file_info["date"]
     return {
         "total_power": f"{total_power:,}",
         "total_killpoints": f"{total_killpoints:,}",
@@ -27,11 +28,12 @@ def analyse_top_scanfile(file, top):
         "total_t4_kills": f"{total_t4_kills:,}",
         "total_t5_kills": f"{total_t5_kills:,}",
         "sum_total_kills": f"{sum_total_kills:,}",
-        "total_ressources_gathered": f"{total_ressources_gathered:,}"
+        "total_ressources_gathered": f"{total_ressources_gathered:,}",
+        "date": date
     }
 
 
-result = analyse_top_scanfile("DKP_scan/3165_top900.xlsx", top=300)
+result = analyse_top_scanfile("DKP_scan/3165_top900.xlsx", top=300) #Change the file name and the top value
 
 def count_people_by_power(file, top):
     file_info = pd.read_excel(io=file, usecols=["Power"], nrows=top)
@@ -40,7 +42,7 @@ def count_people_by_power(file, top):
     above_60m = len(file_info[file_info["Power"] > 60000000])
     return above_100m, above_80m, above_60m
 
-above_100m, above_80m, above_60m = count_people_by_power("DKP_scan/3165_top900.xlsx", top=300)
+above_100m, above_80m, above_60m = count_people_by_power("DKP_scan/3165_top900.xlsx", top=300) #Change the file name and the top value
 
 result["people_above_100m"] = str(above_100m)
 result["people_above_80m"] = str(above_80m)
