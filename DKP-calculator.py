@@ -57,7 +57,7 @@ class MyCustomDKPFormula(customtkinter.CTkFrame):
         self.t5 = 6
         self.t4deads = 18
         self.t5deads = 32
-        self.deads = 25
+        self.deads = 18
         
         self.title = customtkinter.CTkLabel(self, text=self.title, fg_color="gray30", corner_radius=6)
         self.title.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="ew")
@@ -142,16 +142,22 @@ class App(customtkinter.CTk):
         self.dkfile_name = MyCustomDKPFileName(self, "DKP File Name")
         self.dkfile_name.grid(row=7, column=0, padx=10, pady=(10, 0), sticky="nsew")
         
+        self.format_numbers_var = tkinter.BooleanVar(value=True)
+        self.format_numbers_checkbox = customtkinter.CTkCheckBox(self, text="Format Numbers", variable=self.format_numbers_var)
+        self.format_numbers_checkbox.grid(row=8, column=0, padx=10, pady=(10, 0), sticky="ew")
 
         self.button = customtkinter.CTkButton(self, text="get DKP file", command=self.button_callback)
         self.button.grid(row=9, column=0, padx=10, pady=10, sticky="ew", columnspan=2)
         
         
-    def CalculateDKPSimple(self, file1, file2, new_file_name, t4, t5, deads):
+    def CalculateDKPSimple(self, file1, file2, new_file_name, t4, t5, deads, format_numbers):
         # Calculate the DKP for the two files and return the result
         
         file1_info = pd.read_excel(io=file1, usecols=["ID","Name", "Power", "T4 Kills", "T5 Kills", "Deads", "Killpoints"])
         file2_info = pd.read_excel(io=file2, usecols=["ID","Name", "Power", "T4 Kills", "T5 Kills", "Deads", "Killpoints"])
+        
+        # Merge the two dataframes on ID
+        merged_info = pd.merge(file1_info, file2_info, on="ID", suffixes=('_file1', '_file2'))
         
         diff_power = []
         t4_kills_diff = []
@@ -160,31 +166,35 @@ class App(customtkinter.CTk):
         kp_diff = []
         dkp = []
         
-        for i in range(len(file1_info)):
-            diff_power.append(file2_info["Power"][i] - file1_info["Power"][i])
-            t4_kills_diff.append(file2_info["T4 Kills"][i] - file1_info["T4 Kills"][i])
-            t5_kills_diff.append(file2_info["T5 Kills"][i] - file1_info["T5 Kills"][i])
-            deads_diff.append(file2_info["Deads"][i] - file1_info["Deads"][i])
-            kp_diff.append(file2_info["Killpoints"][i] - file1_info["Killpoints"][i])
+        for i in range(len(merged_info)):
+            diff_power.append(merged_info["Power_file2"][i] - merged_info["Power_file1"][i])
+            t4_kills_diff.append(merged_info["T4 Kills_file2"][i] - merged_info["T4 Kills_file1"][i])
+            t5_kills_diff.append(merged_info["T5 Kills_file2"][i] - merged_info["T5 Kills_file1"][i])
+            deads_diff.append(merged_info["Deads_file2"][i] - merged_info["Deads_file1"][i])
+            kp_diff.append(merged_info["Killpoints_file2"][i] - merged_info["Killpoints_file1"][i])
             dkp.append((int(t4_kills_diff[i]) * int(t4)) + (int(t5_kills_diff[i]) * int(t5) + (int(deads_diff[i]) * int(deads))))
             
 
             
         #append the dkp and all the diff to the new file
         new_file = pd.DataFrame()
-        new_file["ID"] = file1_info["ID"]
-        new_file["Name"] = file1_info["Name"]
-        new_file["Old Power"] = file1_info["Power"]
-        new_file["Current Power"] = file2_info["Power"]
+        new_file["ID"] = merged_info["ID"]
+        new_file["Name"] = merged_info["Name_file1"]
+        new_file["Old Power"] = merged_info["Power_file1"]
+        new_file["Current Power"] = merged_info["Power_file2"]
         new_file["Diff Power"] = diff_power
         new_file["T4 Kills"] = t4_kills_diff
         new_file["T5 Kills"] = t5_kills_diff
-        new_file["Old_KP"] = file1_info["Killpoints"]
-        new_file["Current_KP"] = file2_info["Killpoints"]
+        new_file["Old_KP"] = merged_info["Killpoints_file1"]
+        new_file["Current_KP"] = merged_info["Killpoints_file2"]
         new_file["KP Gained"] = kp_diff
         new_file["Deads"] = deads_diff
         new_file["DKP"] = dkp
         
+        # Format numbers to be more readable if the checkbox is checked
+        if format_numbers:
+            for column in ["Old Power", "Current Power", "Diff Power", "T4 Kills", "T5 Kills", "Old_KP", "Current_KP", "KP Gained", "Deads", "DKP"]:
+                new_file[column] = new_file[column].apply(lambda x: "{:,}".format(x))
         
         #save the new file
         current_dir = os.getcwd()
@@ -199,6 +209,7 @@ class App(customtkinter.CTk):
         file_paths = self.file_browser_frame.get()
         new_file_name = self.dkfile_name.get()
         t4, t5, t4deads, t5deads, deads = self.dkp_formula_frame.get()
+        format_numbers = self.format_numbers_var.get()
         if(file_paths == None or t4 == () or t5 == () or t4deads == () or t5deads == () or deads == ()):
             print("Error")
             return
@@ -208,7 +219,7 @@ class App(customtkinter.CTk):
                 tkinter.messagebox.showinfo("Error", "The file already exists")
                 return 
             
-            self.CalculateDKPSimple(file_paths[0], file_paths[1], new_file_name, t4, t5, deads)
+            self.CalculateDKPSimple(file_paths[0], file_paths[1], new_file_name, t4, t5, deads, format_numbers)
             tkinter.messagebox.showinfo("Success", "The DKP file has been created")
         
     
@@ -217,4 +228,3 @@ class App(customtkinter.CTk):
 
 app = App()
 app.mainloop()
-
