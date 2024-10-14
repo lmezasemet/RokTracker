@@ -174,9 +174,7 @@ class App(customtkinter.CTk):
             kp_diff.append(merged_info["Killpoints_file2"][i] - merged_info["Killpoints_file1"][i])
             dkp.append((int(t4_kills_diff[i]) * int(t4)) + (int(t5_kills_diff[i]) * int(t5) + (int(deads_diff[i]) * int(deads))))
             
-
-            
-        #append the dkp and all the diff to the new file
+        # Create the new file dataframe
         new_file = pd.DataFrame()
         new_file["ID"] = merged_info["ID"]
         new_file["Name"] = merged_info["Name_file1"]
@@ -191,16 +189,20 @@ class App(customtkinter.CTk):
         new_file["Deads"] = deads_diff
         new_file["DKP"] = dkp
         
+        # Add ranking columns
+        new_file["DKP Rank"] = new_file["DKP"].rank(ascending=False, method='min').astype(int)
+        new_file["KP Gained Rank"] = new_file["KP Gained"].rank(ascending=False, method='min').astype(int)
+        new_file["Deads Rank"] = new_file["Deads"].rank(ascending=False, method='min').astype(int)
+        
         # Format numbers to be more readable if the checkbox is checked
         if format_numbers:
             for column in ["Old Power", "Current Power", "Diff Power", "T4 Kills", "T5 Kills", "Old_KP", "Current_KP", "KP Gained", "Deads", "DKP"]:
                 new_file[column] = new_file[column].apply(lambda x: "{:,}".format(x))
         
-        #save the new file
+        # Save the new file
         current_dir = os.getcwd()
-
-        file_path = os.path.join(current_dir+ "/DKP_scan", new_file_name)
-        new_file.to_excel(file_path+".xlsx", index=False)
+        file_path = os.path.join(current_dir + "/DKP_scan/KVK6", new_file_name)
+        new_file.to_excel(file_path + ".xlsx", index=False)
         
         return new_file
         
@@ -214,8 +216,8 @@ class App(customtkinter.CTk):
             print("Error")
             return
         else:
-            #check if the file exists
-            if(os.path.exists(os.getcwd()+"/DKP_scan/"+new_file_name+".xlsx")):
+            # Check if the file exists
+            if(os.path.exists(os.getcwd() + "/DKP_scan/" + new_file_name + ".xlsx")):
                 tkinter.messagebox.showinfo("Error", "The file already exists")
                 return 
             
@@ -223,8 +225,5 @@ class App(customtkinter.CTk):
             tkinter.messagebox.showinfo("Success", "The DKP file has been created")
         
     
-   
-
-
 app = App()
 app.mainloop()
