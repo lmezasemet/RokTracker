@@ -625,3 +625,4 @@ deps/*.whl
 /DKP_scan
 /Analyse_kd_stats
 DKP-calculator.py
+DKP-update.py
